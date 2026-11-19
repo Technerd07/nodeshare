@@ -30,25 +30,62 @@ on_err (){
 	"$rc" "$line" "$BASH_COMAND" >&2
 }
 trap on_err ERR
-install_dependancies (){
-	#first install networking utils
-	if [[ $package_manager == "apt" ]]; then
-			apt-get install iproute2 &>/dev/null;
-		elif [[ $package_manager == "packman" ]];then
-			packman -S iproute2
-		else
-			dnf install iproute2
-	fi >> LOG_FILE 2>&1
-	packages=(iproute2 jq)
-	for package in "${packages[@]}"; do 
-		apt-get install $package >> LOG_FILE 2>&1
+trap 'echo "Execution Interrupted"; exit 1' INT #Handle crtl+c interrupt
+#Run as root
+ensure_root (){
+	if [[ $EUID -ne 0 ]]; then
+		if ! command -v sudo > /dev/null; then
+			printf 'Error: root privileges required and sudo is not installed.\n' >&2
+			return 1;
+		fi
+		printf 'Elevating previliges with sudo ...\n' >&2
+		exec sudo -- "$0" "$@"
+	fi
+}
+install_package (){
+	local pm=$1
+	local package=$2
+
+	case "$pm" in
+		apt-get)
+			DEBIAN_FRONTEND=noninteractive apt-get update -qq
+			DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${package}"  
+			;;
+		packman)
+			pacman -S --noconfirm --needed "${package}"
+			;;
+		dnf)
+			dnf install -y -q "${package}"
+			;;
+		yum)
+			yum install -y -q "${package}"
+			;;
+		apk)
+			apk add --no-cache "${package}"
+			;;
+		zypper)
+			zypper --non-interactive install "${package}"
+			;;
+		*)
+			echo "Unsupported package manager ${pm}" >&2
+			return 1;
+		;;
+		esac
+}
+install_dependencies (){
+	local -a pkgs=(iproute2 jq)
+	local pm=$1
+	init_runtime_dir
+	for pkg in "${pkgs[@]}"; do
+		install_package "$pm" "$pkg" >> "${LOG_FILE}" 2>&1
 	done
 }
 collect_networklogs (){
-	local networks.log
+	local ip_addr=""
     printf '\n--- Run started: %s ---\n' "$(date)"
-	ip route show | tee -a networks.log
+	ip route show | tee -a "${NET_LOGFILE}"
 	#Gather Ip details im using eth0 inmy case 
 	echo
-	ifconfig eth0 | awk '/inet / {printf $3}' >> networks.log
+	ip_addr="$(ifconfig eth0 | awk '/inet / {printf $3}')"
+	printf '%s\n' "${ip_addr}" >> "${NET_LOGFILE}"
 }
