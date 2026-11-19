@@ -1,15 +1,19 @@
 #!/bin/bash
 set -x
 set -euo pipefail
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/dependancies.sh"
 
 if  [[ $EUID -ne 0 ]];then
 	echo "Running as root"
 	exec "$0" "$@"
 fi
+declare -r name
+declare -rw package_manager
 #Gather os information
 gather_osinfo (){
 	local os_id=unknown
-	local os_version,name
+	local os_version
 	local hostname
 
 	#get os information
@@ -20,10 +24,9 @@ gather_osinfo (){
 		os_version="${VERSION:-}"
 		name="${NAME:-}"
 	fi
+	pms=(apk yum pacman dnf zypper apt-get)
 	#check the package manager 
-	pakcage_manager
-	local pms=(apk yum pacman dnf zypper apt-get)
-	for pm in "${pms[@]}"; do 
+		for pm in "${pms[@]}"; do 
 		if command -v $pm > /dev/null; then
 			echo "package manager: $pm"
 			break;
@@ -34,6 +37,7 @@ gather_osinfo (){
 	printf '%s\n hosname of system: $hostname'
 }
 gather_networking (){
+	
 
 }
 
