@@ -1,20 +1,19 @@
 #!/bin/bash
 set -x
-set -euo pipefail
+set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/dependancies.sh"
-
-if  [[ $EUID -ne 0 ]];then
-	echo "Running as root"
-	exec "$0" "$@"
-fi
-declare -r name
-declare -rw package_manager
+ensure_root
 #Gather os information
 gather_osinfo (){
+	local name package_manager
 	local os_id=unknown
-	local os_version
-	local hostname
+	local os_version=""
+	local hostname=""
+	local pm
+	local -a pms=(apk yum pacman dnf zypper apt-get)
+	package_manager=""
+
 
 	#get os information
 	if [[ -r /etc/os-release ]];then
@@ -24,25 +23,30 @@ gather_osinfo (){
 		os_version="${VERSION:-}"
 		name="${NAME:-}"
 	fi
-	pms=(apk yum pacman dnf zypper apt-get)
-	#check the package manager 
+		#check the package manager 
 		for pm in "${pms[@]}"; do 
-		if command -v $pm > /dev/null; then
+		if command -v $pm > /dev/null 2>&1; then
 			echo "package manager: $pm"
-			break;
 			package_manager=$pm
+			break;
+		fi 
+		if [[ -z "${package_manager}" ]]; then
+			echo "Could not identify supported Package Manager!"
+			return 1
 		fi
+		install_dependancies "${package_manager}"
 	done
 	hostname < "$(hostname)"
-	printf '%s\n hosname of system: $hostname'
+	printf '%s\n' "hosname of system: ${hostname}"
 }
 gather_networking (){
-	
-
+	echo "Networking Information"
+	collect_networklogs 	
 }
 
 main (){
-	gather_osinfo
+	init_runtime_dir
+	gather_osinfo >> "${LOG_FILE}" 2>&1 ;
 }
 
 main "$@"

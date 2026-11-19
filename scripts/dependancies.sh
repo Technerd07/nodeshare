@@ -2,7 +2,6 @@
 set -x
 set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/nodecollect.sh"
 LOG_DIR="${LOG_DIR:-${SCRIPT_DIR}/logs}"
 LOG_FILE="${LOG_FILE:-${LOG_DIR}/install.log}"
 NET_LOGFILE="${NET_LOGFILE:-${LOG_DIR}/networks.log}"
@@ -30,7 +29,8 @@ on_err (){
 	"$rc" "$line" "$BASH_COMAND" >&2
 }
 trap on_err ERR
-trap 'echo "Execution Interrupted"; exit 1' INT #Handle crtl+c interrupt
+trap 'echo "Execution Interrupted\n">&2;exit 130' INT #Handle crtl+c interrupt
+trap 'printf "Terminated\n" >&2; exit 143' TERM
 #Run as root
 ensure_root (){
 	if [[ $EUID -ne 0 ]]; then
