@@ -3,8 +3,11 @@ set -x
 set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/dependancies.sh"
-ensure_root
-#Gather os information
+#Gathertrap on_err ERR
+trap cleanup EXIT
+trap 'printf "Interrupted\n" >&2; exit 130' INT
+trap 'printf "Terminated\n" >&2; exit 143' TERM os information
+
 gather_osinfo (){
 	local name package_manager
 	local os_id=unknown
@@ -45,8 +48,11 @@ gather_networking (){
 }
 
 main (){
+	ensure_root
 	init_runtime_dir
-	gather_osinfo >> "${LOG_FILE}" 2>&1 ;
+ {
+	gather_osinfo
+ }>>"${LOG_FILE}" 2>&1;
 }
 
 main "$@"
