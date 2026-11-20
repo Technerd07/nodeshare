@@ -13,7 +13,14 @@ jobs:
    steps:
       - name: check repository
         uses: actions/checkout@v4
-
       - name: run script
         working-directory: scripts/
         run: bash nodecollect.sh
+      - name: Show install logs on failure
+        if: failure()
+        run: |
+          if [[ -f logs/install.log ]]; then
+            cat logs/install.log
+            else
+              echo "No Install log was created";
+          fi
