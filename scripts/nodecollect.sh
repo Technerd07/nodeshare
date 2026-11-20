@@ -7,8 +7,13 @@ source "$SCRIPT_DIR/dependencies.sh"
 trap cleanup EXIT
 trap 'printf "Interrupted\n" >&2; exit 130' INT
 trap 'printf "Terminated\n" >&2; exit 143' TERM 
-#gather os information
 
+#Gather networking
+gather_networking (){
+	echo "Networking Information"
+	collect_networklogs 	
+}
+#Gather os information
 gather_osinfo (){
 	local name package_manager
 	local os_id=unknown
@@ -42,20 +47,16 @@ gather_osinfo (){
 		install_dependencies "${package_manager}"
 	hostname="$(hostname)"
 	printf '%s\n' "hosname of system: ${hostname}"
+	gather_networking
 }
-gather_networking (){
-	echo "Networking Information"
-	collect_networklogs 	
-}
+
 
 main (){
 	#ensure_root
 	init_runtime_dir
  {
 	gather_osinfo
- }
- #>>"${LOG_FILE}" 2>&1;
+ }>>"${LOG_FILE}" 2>&1;
 }
-
 main "$@"
 
