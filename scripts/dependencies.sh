@@ -70,11 +70,13 @@ install_dependencies (){
 	local pm=$1
 	local pkg
 	for pkg in "${pkgs[@]}"; do
-		install_package "$pm" "$pkg" >> "${LOG_FILE}" 2>&1
+		install_package "$pm" "$pkg" 
+		#>> "${LOG_FILE}" 2>&1
 	done
 }
 collect_networklogs (){
 	ip link
 	ip addr
 	ip route
-}>> "${NET_LOGFILE}" 2>&1
+}
+#>> "${NET_LOGFILE}" 2>&1
