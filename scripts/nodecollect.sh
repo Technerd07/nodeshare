@@ -2,7 +2,7 @@
 set -x
 set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/dependancies.sh"
+source "$SCRIPT_DIR/dependencies.sh"
 #Gathertrap on_err ERR
 trap cleanup EXIT
 trap 'printf "Interrupted\n" >&2; exit 130' INT

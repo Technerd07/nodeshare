@@ -1,9 +1,11 @@
 name: Testing-shell-scripts
 on: 
   push:
-    branches: ["main"]
+    branches:
+      - main
   pull_request:
-    branches: ["main"]
+    branches: 
+      - main
 jobs:
   Run-scripts:
    name: run-nodecollect.sh script on runner
@@ -14,5 +16,4 @@ jobs:
 
       - name: run script
         working-directory: scripts/
-        run: |
-          bash nodecollect.sh
+        run: bash nodecollect.sh
