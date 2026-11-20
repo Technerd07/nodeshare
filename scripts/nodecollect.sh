@@ -53,7 +53,8 @@ main (){
 	init_runtime_dir
  {
 	gather_osinfo
- }>>"${LOG_FILE}" 2>&1;
+ }
+ #>>"${LOG_FILE}" 2>&1;
 }
 
 main "$@"
