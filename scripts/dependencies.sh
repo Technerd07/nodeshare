@@ -7,7 +7,7 @@ TEMP_WORK_DIR=""
 #create runtime directory (temp)
 init_runtime_dir (){
 	mkdir -p -- "${LOG_DIR}"
-	if [[ -z "${TMP_WORK_DIR:-}" ]]; then
+	if [[ -z "${TEMP_WORK_DIR:-}" ]]; then
 		TEMP_WORK_DIR="$(mktemp -d)"
 	fi
 }
@@ -40,7 +40,7 @@ install_package (){
 	local package=$2
 
 	case "$pm" in
-		apt-get)
+		apt)
 			DEBIAN_FRONTEND=noninteractive apt-get update -qq
 			DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${package}"  
 			;;

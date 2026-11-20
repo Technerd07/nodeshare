@@ -1,0 +1,71 @@
++ gather_osinfo
++ local name package_manager
++ local os_id=unknown
++ local os_version=
++ local hostname=
++ local pm
++ pms=('apk' 'yum' 'pacman' 'dnf' 'zypper' 'apt')
++ local -a pms
++ package_manager=
++ [[ -r /etc/os-release ]]
++ source /etc/os-release
+++ PRETTY_NAME='Ubuntu 26.04.1 LTS'
+++ NAME=Ubuntu
+++ VERSION_ID=26.04
+++ VERSION='26.04.1 LTS (Resolute Raccoon)'
+++ VERSION_CODENAME=resolute
+++ ID=ubuntu
+++ ID_LIKE=debian
+++ HOME_URL=https://www.ubuntu.com/
+++ SUPPORT_URL=https://help.ubuntu.com/
+++ BUG_REPORT_URL=https://bugs.launchpad.net/ubuntu/
+++ PRIVACY_POLICY_URL=https://www.ubuntu.com/legal/terms-and-policies/privacy-policy
+++ UBUNTU_CODENAME=resolute
+++ LOGO=ubuntu-logo
++ os_id=ubuntu
++ os_version='26.04.1 LTS (Resolute Raccoon)'
++ name=Ubuntu
++ for pm in "${pms[@]}"
++ command -v apk
++ for pm in "${pms[@]}"
++ command -v yum
++ for pm in "${pms[@]}"
++ command -v pacman
++ for pm in "${pms[@]}"
++ command -v dnf
++ for pm in "${pms[@]}"
++ command -v zypper
++ for pm in "${pms[@]}"
++ command -v apt
++ echo 'package manager: apt'
+package manager: apt
++ package_manager=apt
++ break
++ [[ -z apt ]]
++ install_dependencies apt
++ pkgs=('iproute2' 'jq')
++ local -a pkgs
++ local pm=apt
++ local pkg
++ for pkg in "${pkgs[@]}"
++ install_package apt iproute2
++ local pm=apt
++ local package=iproute2
++ case "$pm" in
++ DEBIAN_FRONTEND=noninteractive
++ apt-get update -qq
++ DEBIAN_FRONTEND=noninteractive
++ apt-get install -y -qq iproute2
++ for pkg in "${pkgs[@]}"
++ install_package apt jq
++ local pm=apt
++ local package=jq
++ case "$pm" in
++ DEBIAN_FRONTEND=noninteractive
++ apt-get update -qq
++ DEBIAN_FRONTEND=noninteractive
++ apt-get install -y -qq jq
+++ hostname
++ hostname=132985c2be23
++ printf '%s\n' 'hosname of system: 132985c2be23'
+hosname of system: 132985c2be23

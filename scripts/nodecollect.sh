@@ -6,7 +6,8 @@ source "$SCRIPT_DIR/dependencies.sh"
 #Gathertrap on_err ERR
 trap cleanup EXIT
 trap 'printf "Interrupted\n" >&2; exit 130' INT
-trap 'printf "Terminated\n" >&2; exit 143' TERM os information
+trap 'printf "Terminated\n" >&2; exit 143' TERM 
+#gather os information
 
 gather_osinfo (){
 	local name package_manager
@@ -14,7 +15,7 @@ gather_osinfo (){
 	local os_version=""
 	local hostname=""
 	local pm
-	local -a pms=(apk yum pacman dnf zypper apt-get)
+	local -a pms=(apk yum pacman dnf zypper apt)
 	package_manager=""
 
 
@@ -33,13 +34,13 @@ gather_osinfo (){
 			package_manager=$pm
 			break;
 		fi 
+		done
 		if [[ -z "${package_manager}" ]]; then
 			echo "Could not identify supported Package Manager!"
 			return 1
 		fi
-		install_dependancies "${package_manager}"
-	done
-	hostname < "$(hostname)"
+		install_dependencies "${package_manager}"
+	hostname="$(hostname)"
 	printf '%s\n' "hosname of system: ${hostname}"
 }
 gather_networking (){
