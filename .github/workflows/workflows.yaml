@@ -1,0 +1,17 @@
+name: Testing-shell-scripts
+on: 
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  Run-scripts:
+   name: run-nodecollect.sh script on runner
+   runs-on: ubuntu-latest
+   steps:
+      - name: check repository
+        uses: actions/checkout@v4
+
+      - name: run script
+        run: |
+          bash nodecollect.sh
