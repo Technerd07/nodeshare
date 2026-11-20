@@ -41,8 +41,8 @@ install_package (){
 
 	case "$pm" in
 		apt)
-			DEBIAN_FRONTEND=noninteractive apt update -qq
-			DEBIAN_FRONTEND=noninteractive apt install -y -qq "${package}"  
+			DEBIAN_FRONTEND=noninteractive sudo apt update -qq
+			DEBIAN_FRONTEND=noninteractive sudo apt install -y -qq "${package}"  
 			;;
 		packman)
 			pacman -S --noconfirm --needed "${package}"
