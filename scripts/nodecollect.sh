@@ -49,7 +49,7 @@ gather_networking (){
 }
 
 main (){
-	ensure_root
+	#ensure_root
 	init_runtime_dir
  {
 	gather_osinfo
