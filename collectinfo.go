@@ -1,21 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"runtime"
 	"strconv"
 	"strings"
-	//"strings"
-	//"runtime"
-	//"encoding/json"
 )
 
 type OSInfo struct {
-	Hostname  string
-	Arch      string
-	OS        string
-	CPU_CORES int
+	Hostname  string 
+	Arch      string 
+	OS        string 
+	CPU_CORES int    
+}
+
+type systemInfo struct {
+	OS     OSInfo  
+	Memory meminfo 
 }
 
 func printosinfo() (OSInfo, error) {
@@ -30,17 +34,12 @@ func printosinfo() (OSInfo, error) {
 		OS:        runtime.GOOS,
 		CPU_CORES: runtime.NumCPU(),
 	}
-	fmt.Println("OS-Information")
-	fmt.Println("Hostname: ", info.Hostname)
-	fmt.Println("Arch: ", info.Arch)
-	fmt.Println("OS: ", info.OS)
-	fmt.Println("CPU_CORES: ", info.CPU_CORES)
 	return info, nil
 }
 
 type meminfo struct {
-	TotalKB     uint64
-	AvailableKB uint64
+	TotalKB     uint64 `json:"total_kb"`
+	AvailableKB uint64 `json:"available_kb"`
 }
 
 func parsememoryInfo(rawinput string) map[string]uint64 {
@@ -85,7 +84,8 @@ func readmemoryfile(target *meminfo) error {
 }
 
 func printall() error {
-	if _, err := printosinfo(); err != nil {
+	osInfo, err := printosinfo()
+	if err != nil {
 		return err
 	}
 
@@ -94,8 +94,33 @@ func printall() error {
 		return err
 	}
 
+	fmt.Println("OS Information")
+	fmt.Printf("Hostname: %s\nArchitecture: %s\nOS: %s\nCPU cores: %d\n", osInfo.Hostname, osInfo.Arch, osInfo.OS, osInfo.CPU_CORES)
 	fmt.Println("Memory Information")
 	fmt.Printf("Total memory: %d kB\n", memory.TotalKB)
 	fmt.Printf("Available memory: %d kB\n", memory.AvailableKB)
 	return nil
+}
+func saveToJson(filename string) error {
+	osInfo, err := printosinfo()
+	if err != nil {
+		return err
+	}
+	var memory meminfo
+	if err := readmemoryfile(&memory); err != nil {
+		return err
+	}
+
+	info := systemInfo{OS: osInfo, Memory: memory}
+	data, err := json.MarshalIndent(info, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode system information as JSON: %w", err)
+	}
+	if err := os.WriteFile(filename, data, 0644); err != nil {
+		return fmt.Errorf("write JSON file %q: %w", filename, err)
+	}
+	return nil
+}
+func writeToJson(filename string) error {
+	return saveToJson(filename)
 }
